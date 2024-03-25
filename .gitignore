@@ -1,0 +1,9 @@
+Figures/
+Images/
+Data/
+.Rproj.user/
+*.Rhistory
+*.RData
+*.jpeg
+*.png
+*.jpg
