@@ -3,6 +3,7 @@ getwd()
 coverfinal <- read.csv("./Data/perc_speciesfinalAM.csv")
 
 library(tidyverse)
+
 #Clean data, coverfinal ----
 
 #Run summary to ensure there are not unreasonable values
@@ -54,9 +55,9 @@ coverfinalcl$pl_code <- as.factor(coverfinalcl$pl_code)
 summary(coverfinalcl)
 
 #Confirm data types are correct
-as.factor()
-as.numeric()
-as.character()
+#as.factor()
+#as.numeric()
+#as.character()
 #Reference above functions as needed
 
 #Save clean data ----

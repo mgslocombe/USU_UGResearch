@@ -59,9 +59,9 @@ covertimecl$tms <- as.factor(covertimecl$tms)
 summary(covertimecl)
 
 #Confirm data types are correct
-as.factor()
-as.numeric()
-as.character()
+#as.factor()
+#as.numeric()
+#as.character()
 #Reference above functions as needed
 
 #Save clean data ----
