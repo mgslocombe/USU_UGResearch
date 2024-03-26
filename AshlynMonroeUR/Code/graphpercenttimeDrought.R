@@ -3,7 +3,8 @@ library(tidyverse)
 library(Hmisc)
 library(plotrix)
 library(lubridate)
-
+unique("trt")
+unique("drought")
 
 pctdownload <- read.csv("./Data/clean_perc_covertimeAM.csv", header = TRUE)
 
@@ -35,7 +36,7 @@ date2 <- c("2024-01-05","2024-01-12", "2024-01-22", "2024-02-02", "2024-02-16", 
            "2024-03-08", "2024-03-15") %>%
   ymd()
 
-#Create matrix w/ mean and sd for each plant category for trt 15cm ----
+#Create matrix w/ mean and sd for each plant category for trt drought ----
 #Fineleaf
 
 tms <- seq(1,6)
@@ -46,7 +47,7 @@ colnames(fl_perc) <- c("tms", "mean", "se")
 
 for(i in 1:length(tms)){
   
-  temp <- pct %>% filter(tms == i & trt == "15") %>%
+  temp <- pct %>% filter(tms == i & trt == "drought") %>%
     filter(pl_code == "FL")
   
   fl_perc[i,2] <- mean(temp$perc)
@@ -67,7 +68,7 @@ colnames(wl_perc) <- c("tms", "mean", "se")
 
 for(i in 1:length(tms)){
   
-  temp <- pct %>% filter(tms == i & trt == "15") %>%
+  temp <- pct %>% filter(tms == i & trt == "drought") %>%
     filter(pl_code == "WL")
   
   wl_perc[i,2] <- mean(temp$perc)
@@ -88,7 +89,7 @@ colnames(t_perc) <- c("tms", "mean", "se")
 
 for(i in 1:length(tms)){
   
-  temp <- pct %>% filter(tms == i & trt == "15") %>%
+  temp <- pct %>% filter(tms == i & trt == "drought") %>%
     filter(pl_code == "T")
   
   t_perc[i,2] <- mean(temp$perc)
@@ -109,7 +110,7 @@ colnames(dw_perc) <- c("tms", "mean", "se")
 
 for(i in 1:length(tms)){
   
-  temp <- pct %>% filter(tms == i & trt == "15") %>%
+  temp <- pct %>% filter(tms == i & trt == "drought") %>%
     filter(pl_code == "DW")
   
   dw_perc[i,2] <- mean(temp$perc)
@@ -122,10 +123,10 @@ dw_perc <- as.data.frame(cbind(dw_perc, date))
 
 dw_perc <- dw_perc[,c(1:3,5)]
 
-#Create graph of cover over time for pl groups, trt 15cm ----
+#Create graph of cover over time for pl groups, trt drought ----
 
 plot(x = fl_perc$date, y = fl_perc$mean, type="n", ylim=c(0,100), xlab="", 
-     ylab = "Absolute Percent Cover", main = "15 cm of water", frame = FALSE)
+     ylab = "Absolute Percent Cover", main = "Drought", frame = FALSE)
 with (
   data = fl_perc
   , expr = errbar(date-2, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2, 

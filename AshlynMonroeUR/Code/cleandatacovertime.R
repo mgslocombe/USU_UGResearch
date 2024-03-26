@@ -66,3 +66,4 @@ summary(covertimecl)
 
 #Save clean data ----
 write.csv(covertimecl,"./Data/clean_perc_covertimeAM.csv", row.names=TRUE)
+

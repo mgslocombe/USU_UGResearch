@@ -24,6 +24,7 @@ coverfinal$trt[coverfinal$trt == "sat"] <- "drought"
 coverfinal$pl_code[coverfinal$pl_code == "unid"] <- "unidentified"
 coverfinal$pl_code [coverfinal$pl_code == "unid moss"] <- "unidentified2"
 coverfinal$pl_code [coverfinal$pl_code == "POFO"] <- "POFL"
+coverfinal$pl_code [coverfinal$pl_code == "POFL"] <- "FLPO"
 
 
 #Add column for percent cover from cover class data
@@ -62,3 +63,4 @@ summary(coverfinalcl)
 
 #Save clean data ----
 write.csv(coverfinalcl,"./Data/clean_perc_coverfinalAM.csv", row.names=TRUE)
+
