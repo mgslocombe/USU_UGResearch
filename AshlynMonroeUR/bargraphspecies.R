@@ -1,5 +1,5 @@
 #loading packages and data
-library(tidyvers)
+library(tidyverse)
 finalcover <- read.csv("./Data/clean_perc_coverfinalAM.csv", header = TRUE)
 
 #Cleaning data
@@ -51,12 +51,26 @@ scfin$loc <- as.factor(scfin$loc)
 
 scfin$trt <- as.character(scfin$trt)
 
+
+
 scfin$trt[scfin$trt == "5"] <- "5cm"
 scfin$trt[scfin$trt == "15"] <- "15cm"
 scfin$trt[scfin$trt == "drought"] <- "Drought"
 
 scfin$trt <- as.factor(scfin$trt)
 
+scfin$pl_code <- as.character(scfin$pl_code)
+
+scfin$pl_code[scfin$pl_code == "CHARA"] <- "Muskgrass"
+scfin$pl_code[scfin$pl_code == "FLPO"] <- "Fineleaf Potamogeton"
+scfin$pl_code[scfin$pl_code == "LEMNA"] <- "Duckweed"
+scfin$pl_code[scfin$pl_code == "STFI"] <- "Fineleaf Pondweed"
+scfin$pl_code[scfin$pl_code == "STPE"] <- "Sago Pondweed"
+scfin$pl_code[scfin$pl_code == "ZAPA"] <- "Horned Pondweed"
+scfin$pl_code[scfin$pl_code == "coonstail"] <- "Coonstail"
+
+scfin$pl_code <- as.factor(scfin$pl_code)
+  
 #Graphing
 scfin$loc <- factor(scfin$loc, levels = c('Farmington Bay','Ogden Bay',
                                           'Public Shooting','Salt Creek'))
@@ -65,7 +79,7 @@ scfin$trt <- factor(scfin$trt, levels = c('Drought','5cm','15cm'))
 ggplot(scfin, aes(x = trt, y = meanperc, fill = pl_code)) + 
   geom_bar(stat = 'identity') + xlab("Treatment") + ylab("Absolute Percent Cover") +
   labs(fill = "Plant Catagory") +
-  scale_fill_manual(values=c("#82cbed","red","yellow","green","gold1","olivedrab","blue","brown")) +
+  scale_fill_manual(values=c("#eaed9a","#5f048a","#2f85ad","#2f4aad","#7db382","#e3b886","#7dd5db","#e8bcdb")) +
   facet_wrap("loc",nrow = 1) +
   theme_bw()
 
