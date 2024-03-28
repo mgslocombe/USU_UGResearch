@@ -124,28 +124,28 @@ dw_perc <- dw_perc[,c(1:3,5)]
 #Create graph of cover over time for pl groups, trt 5cm ----
 
 plot(x = fl_perc$date, y = fl_perc$mean, type="n", ylim=c(0,100), xlab="",
-     ylab = "Absolute Percent Cover", main = "5 cm of water", frame = FALSE)
+     ylab = "Absolute Percent Cover", main = "5 cm of water", frame = TRUE)
 with (
   data = fl_perc
-  , expr = errbar(date-2, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2,
+  , expr = errbar(date-1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2,
                   col="#2f85ad", errbar.col="#2f85ad", type = "b")
 )
 
 with (
   data = wl_perc
-  , expr = errbar(date-1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+  , expr = errbar(date-.25, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
                   col="#e3b886", errbar.col="#e3b886", type = "b")
 )
 
 with (
   data = t_perc
-  , expr = errbar(date, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+  , expr = errbar(date+.5, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
                   col="#e8bcdb", errbar.col="#e8bcdb", type = "b")
 )
 
 with (
   data = dw_perc
-  , expr = errbar(date+1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+  , expr = errbar(date+1.25, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
                   col="#5f048a", errbar.col="#5f048a", type = "b")
 )
 
