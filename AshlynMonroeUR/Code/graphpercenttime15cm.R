@@ -4,7 +4,6 @@ library(Hmisc)
 library(plotrix)
 library(lubridate)
 
-
 pctdownload <- read.csv("./Data/clean_perc_covertimeAM.csv", header = TRUE)
 
 #Add rows of data for all 0s ----
