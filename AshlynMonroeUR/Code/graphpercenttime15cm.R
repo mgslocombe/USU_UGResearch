@@ -129,26 +129,26 @@ plot(x = fl_perc$date, y = fl_perc$mean, type="n", ylim=c(0,100), xlab="",
 with (
   data = fl_perc
   , expr = errbar(date-2, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2, 
-                  col="blue", errbar.col="blue", type = "b")
+                  col="#2f85ad", errbar.col="#2f85ad", type = "b")
 )
 
 with (
   data = wl_perc
   , expr = errbar(date-1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="lightblue", errbar.col="lightblue", type = "b")
+                  col="#e3b886", errbar.col="#e3b886", type = "b")
 )
 
 with (
   data = t_perc
   , expr = errbar(date, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="gold1", errbar.col="gold1", type = "b")
+                  col="#e8bcdb", errbar.col="#e8bcdb", type = "b")
 )
 
 with (
   data = dw_perc
   , expr = errbar(date+1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="olivedrab", errbar.col="olivedrab", type = "b")
+                  col="#5f048a", errbar.col="#5f048a", type = "b")
 )
 
 legend("topleft", legend=c("Fineleaf", "Whorled", "Terrestrial", "Duckweed"), 
-       col=c("blue", "lightblue", "gold1", "olivedrab"),pch=16, bty="n")
+       col=c("#2f85ad", "#e3b886", "#e8bcdb", "#5f048a"),pch=16, bty="n")

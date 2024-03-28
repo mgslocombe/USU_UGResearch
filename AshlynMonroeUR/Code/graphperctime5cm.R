@@ -8,10 +8,10 @@ pctdownload <- read.csv("./Data/clean_perc_covertimeAM.csv", header = TRUE)
 
 #Add rows of data for all 0s ----
 #Edit pct to only include plant codes of interest (FL, WL, T, DW) and no PRD
-pctcl <- pctdownload %>% filter(pl_code == "FL" | 
-                          pl_code == "WL" | 
-                          pl_code == "T" | 
-                          pl_code == "DW") %>%
+pctcl <- pctdownload %>% filter(pl_code == "FL" |
+                                  pl_code == "WL" |
+                                  pl_code == "T" |
+                                  pl_code == "DW") %>%
   filter(loc != "PRD")
 
 pctfill <- crossing(1:6, pctcl$block, pctcl$loc, pctcl$trt, pctcl$pl_code)
@@ -26,11 +26,11 @@ pct$pro[is.na(pct$pro)] <- 0
 pct <- pct %>%
   mutate(perc = pro * 100)
 
-date <- c("2024-01-12", "2024-01-22", "2024-02-02", "2024-02-16", "2024-03-01", 
+date <- c("2024-01-12", "2024-01-22", "2024-02-02", "2024-02-16", "2024-03-01",
           "2024-03-08") %>%
   ymd()
 
-date2 <- c("2024-01-05","2024-01-12", "2024-01-22", "2024-02-02", "2024-02-16", "2024-03-01", 
+date2 <- c("2024-01-05","2024-01-12", "2024-01-22", "2024-02-02", "2024-02-16", "2024-03-01",
            "2024-03-08", "2024-03-15") %>%
   ymd()
 
@@ -122,33 +122,32 @@ dw_perc <- as.data.frame(cbind(dw_perc, date))
 dw_perc <- dw_perc[,c(1:3,5)]
 
 #Create graph of cover over time for pl groups, trt 5cm ----
-plot(x = fl_perc$date, y = fl_perc$mean, type="n", ylim=c(0,100), xlab="", 
-     ylab = "Absolute Percent Cover", main = "5 cm of water", frame = FALSE, 
-     xaxt = "n")
-axis(1, fl_perc$date, format(fl_perc$date, "%b %d"), cex.axis = .7)
+
+plot(x = fl_perc$date, y = fl_perc$mean, type="n", ylim=c(0,100), xlab="",
+     ylab = "Absolute Percent Cover", main = "5 cm of water", frame = FALSE)
 with (
   data = fl_perc
-  , expr = errbar(date-1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2, 
-                  col="blue", errbar.col="blue", type = "b")
+  , expr = errbar(date-2, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd=2,
+                  col="#2f85ad", errbar.col="#2f85ad", type = "b")
 )
 
 with (
   data = wl_perc
-  , expr = errbar(date, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="lightblue", errbar.col="lightblue", type = "b")
+  , expr = errbar(date-1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+                  col="#e3b886", errbar.col="#e3b886", type = "b")
 )
 
 with (
   data = t_perc
-  , expr = errbar(date+1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="gold1", errbar.col="gold1", type = "b")
+  , expr = errbar(date, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+                  col="#e8bcdb", errbar.col="#e8bcdb", type = "b")
 )
 
 with (
   data = dw_perc
-  , expr = errbar(date+2, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
-                  col="olivedrab", errbar.col="olivedrab", type = "b")
+  , expr = errbar(date+1, mean, mean+se, mean-se, add=T, pch=19, cex=1.5, cap=.0, lwd =2,
+                  col="#5f048a", errbar.col="#5f048a", type = "b")
 )
 
-legend("topleft", legend=c("Fineleaf", "Whorled", "Terrestrial", "Duckweed"), 
-       col=c("blue", "lightblue", "gold1", "olivedrab"),pch=16, bty="n")
+legend("topleft", legend=c("Fineleaf", "Whorled", "Terrestrial", "Duckweed"),
+       col=c("#2f85ad", "#e3b886", "#e8bcdb", "#5f048a"),pch=16, bty="n")
