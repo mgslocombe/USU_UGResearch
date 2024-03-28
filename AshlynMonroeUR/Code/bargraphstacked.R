@@ -85,12 +85,14 @@ scfin$pl_code <- factor(scfin$pl_code,
                                    'Muskgrass', 'Duckweed', 'Terrestrial'))
 
 ggplot(scfin, aes(x = trt, y = meanperc, fill = pl_code)) + 
-  geom_bar(stat = 'identity') + xlab("Treatment") + ylab("Absolute Percent Cover") +
+  geom_bar(stat = 'identity') + xlab(" ") + ylab("Absolute Percent Cover") +
   labs(fill = "Plant Catagory") +
-  scale_fill_manual(values=c("#7dd5db","#2f85ad","#2f4aad","#1c3180","#eaed9a","#e3b886","#5f048a","#e8bcdb")) +
+  scale_fill_manual(values=c("#b6dee0","#7dd5db","#2f85ad","#2f4aad","#eaed9a","#e3b886","#5f048a","#e8bcdb")) +
   facet_wrap("loc",nrow = 1) +
   theme_bw() +
   theme(axis.line = element_line(color='black'),
         plot.background = element_blank(),
         panel.grid.minor = element_blank(),
-        panel.grid.major = element_blank())
+        panel.grid.major = element_blank())+
+  theme(strip.background = element_blank())+
+  theme(legend.text = element_text(size=6.5))
