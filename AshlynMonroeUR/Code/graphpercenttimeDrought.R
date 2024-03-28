@@ -151,5 +151,5 @@ with (
                   col="#5f048a", errbar.col="#5f048a", type = "b")
 )
 
-legend("topleft", legend=c("Fineleaf", "Whorled", "Terrestrial", "Duckweed"), 
+legend("topleft", legend=c("Fineleaf", "Whorled", "Terrestrial", "Duckweed"),
        col=c("#2f85ad", "#e3b886", "#e8bcdb", "#5f048a"),pch=16, bty="n")
