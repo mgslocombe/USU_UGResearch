@@ -17,7 +17,7 @@ finalcovercl <- finalcovercl %>%
 
 #adding zeros to get cover average
 scfill <- crossing(finalcovercl$block, finalcovercl$loc, finalcovercl$trt,
-                    finalcovercl$pl_code)
+                   finalcovercl$pl_code)
 colnames(scfill) <- c("block", "loc", "trt", "pl_code")
 
 sc <- scfill %>%
@@ -62,7 +62,8 @@ scfin$trt <- as.factor(scfin$trt)
 scfin$pl_code <- as.character(scfin$pl_code)
 
 scfin$pl_code[scfin$pl_code == "CHARA"] <- "Muskgrass"
-scfin$pl_code[scfin$pl_code == "FLPO"] <- "Fineleaf Potamogeton"
+scfin$pl_code[scfin$pl_code == "FLPO"] <- "Fineleaf Potamogeton spp." 
+#added spp to help clarify that this is multiple species
 scfin$pl_code[scfin$pl_code == "LEMNA"] <- "Duckweed"
 scfin$pl_code[scfin$pl_code == "STFI"] <- "Fineleaf Pondweed"
 scfin$pl_code[scfin$pl_code == "STPE"] <- "Sago Pondweed"
@@ -71,16 +72,25 @@ scfin$pl_code[scfin$pl_code == "coonstail"] <- "Coonstail"
 scfin$pl_code[scfin$pl_code == "terrestrial"] <- "Terrestrial"
 
 scfin$pl_code <- as.factor(scfin$pl_code)
-  
+
 #Graphing
 scfin$loc <- factor(scfin$loc, levels = c('Farmington Bay','Ogden Bay',
                                           'Public Shooting','Salt Creek'))
 scfin$trt <- factor(scfin$trt, levels = c('Drought','5cm','15cm'))
 
+#Setting levels for pl_code so that similar species are are stacked on one another
+scfin$pl_code <- factor(scfin$pl_code, 
+                        levels = c('Fineleaf Pondweed','Fineleaf Potamogeton spp.',
+                                   'Horned Pondweed', 'Sago Pondweed', 'Coonstail',
+                                   'Muskgrass', 'Duckweed', 'Terrestrial'))
+
 ggplot(scfin, aes(x = trt, y = meanperc, fill = pl_code)) + 
   geom_bar(stat = 'identity') + xlab("Treatment") + ylab("Absolute Percent Cover") +
   labs(fill = "Plant Catagory") +
-  scale_fill_manual(values=c("#eaed9a","#5f048a","#2f85ad","#2f4aad","#7db382","#e3b886","#7dd5db","#e8bcdb")) +
+  scale_fill_manual(values=c("#7dd5db","#2f85ad","#2f4aad","#1c3180","#eaed9a","#e3b886","#5f048a","#e8bcdb")) +
   facet_wrap("loc",nrow = 1) +
-  theme_bw()
-
+  theme_bw() +
+  theme(axis.line = element_line(color='black'),
+        plot.background = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank())
