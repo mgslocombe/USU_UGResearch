@@ -1,0 +1,5 @@
+Git/GitHub steps
+git status
+git add --all
+git commit -m "explanation of changes"
+git push

@@ -2,27 +2,61 @@
 library(DBI)
 library(tidyverse)
 
-#Load data
+# Connect to SQLite database
 deltavegdb<-dbConnect(RSQLite::SQLite(),"./Data/deltavegsurvey.db")
 
-#Plot data
-plot<- dbGetQuery(deltavegdb, "SELECT * FROM plot;")
-site<- dbGetQuery(deltavegdb, "SELECT * FROM site;")
+# Load csv data
+plot_data<- dbGetQuery(deltavegdb, "SELECT * FROM plot;")
+site_data<- dbGetQuery(deltavegdb, "SELECT * FROM site;")
 
-head(site)
-head(plot)
+head(site_data)
+head(plot_data)
 
-#filter to 2023 and format data
-plot23 <- plot %>%
-  left_join(site, by = "siteID_date") %>%
-  select(siteID_date:perc_cov, survey_date) %>%
-  filter(survey_date=="23/08/01" | survey_date=="23/08/02") %>%
-  filter(plt_code=="" | plt_code=="POCR") %>%
-  mutate(percent = ifelse(perc_cov==1, 0.05/2, ifelse(
-    perc_cov==2, (.25+.05)/2, ifelse(
-      perc_cov==3, (.5+.25)/2, ifelse(
-        perc_cov==4, (.75+.5)/2, ifelse(
-          perc_cov==5, (.95+.75)/2, ifelse(
-            perc_cov==6, (1+.95)/2, NA
-            )))))))
-unique(plot23$perc_cov)
+# Filter site data fro 2023-August and 2024-July
+site_filtered <- site_data %>%
+  filter(survey_date %in% c('23/08/01', '23/08/02', '24/07/16', '24/07/17')) %>%
+  mutate(year = case_when(
+    survey_date %in% c('23/08/01', '23/08/02') ~ 2023,
+    survey_date %in% c('24/07/16', '24/07/17') ~ 2024
+  ))
+
+view(site_filtered)
+         
+# Join plot data with site data on site ID and siteID_date
+joined_data <- plot_data %>%
+  inner_join(site_filtered, by = "siteID_date") %>%
+  filter(plt_code == "POCR") %>%
+  mutate(percent = ifelse(perc_cov==1, 0.05/2,
+            ifelse(perc_cov==2, (.25+.05)/2,
+            ifelse(perc_cov==3, (.5+.25)/2,
+            ifelse(perc_cov==4, (.75+.5)/2,
+            ifelse(perc_cov==5, (.95+.75)/2,
+            ifelse(perc_cov==6, (1+.95)/2, NA)))))))
+str(joined_data)
+view(joined_data)
+
+# Calculate mean cover by plot and site, accounting for NAs and 0s
+mean_cover <- joined_data %>%
+  group_by(siteID.x, year) %>%
+  summarise(mean_cover = mean(percent, na.rm = TRUE), .groups = 'drop')
+
+print(mean_cover)
+
+# Format data
+formatted_data <- mean_cover %>%
+  pivot_wider(names_from = year, values_from = mean_cover) %>%
+  filter(!is.na('2023') & !is.na('2024'))
+
+print(formatted_data)
+
+# Run paired t-test comparing mean cover between 2023 and 2024
+t_test_result <- t.test(formatted_data$'2023', formatted_data$'2024', paired = TRUE)
+
+print(t_test_result)
+
+# We can be 95% confident (or there is strong evidence)
+# that the mean cover of Potamogeton crispus in the Provo River Delta in 2024 is between
+# -1.2491 and 1.7157 units different from the  mean cover in 2023.
+# The mean difference indicates that, on average, the cover in 2024 is approximately
+# 0.2333 units higher than in 2023,
+# although this difference is not statistically significant (p-value = 0.2952).
