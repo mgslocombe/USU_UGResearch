@@ -32,7 +32,7 @@ dbExecute(delvegsur, "CREATE TABLE plot (
           plot varchar(6) CHECK (plot IN ('center', 'north', 'east', 'south', 'west')),
           plt_code varchar(14) CHECK (plt_code IN ('', 'STPE', 'POCR', 'ZAPA', 'PHCA', 'rushspp', 'filalg', 'lemnaspp', 'RUCI', 'POAM', 'STFI', 'unkgrass', 'spirodelaspp', 'AZMI', 'RAAQ', 'CEDE', 'algae', 'fineleafpotamogeton')),
           height_cm varchar(3),
-          perc_cov varchar(1) CHECK (perc_cov IN('', '1', '2', '3', '4', '5', '6')),
+          perc_cov varchar(1) CHECK (perc_cov IN('', '0', '1', '2', '3', '4', '5', '6')),
           FOREIGN KEY (siteID_date) REFERENCES site(siteID_date)
 );")
 
