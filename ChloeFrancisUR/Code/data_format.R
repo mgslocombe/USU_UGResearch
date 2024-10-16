@@ -1,6 +1,7 @@
 #Load packages
 library(DBI)
 library(tidyverse)
+library(ggplot2)
 
 # Connect to SQLite database
 deltavegdb<-dbConnect(RSQLite::SQLite(),"./Data/deltavegsurvey.db")
@@ -21,39 +22,89 @@ site_filtered <- site_data %>%
   ))
 
 view(site_filtered)
+view(plot_data)
          
 # Join plot data with site data on site ID and siteID_date
 joined_data <- plot_data %>%
   filter(plt_code == "POCR" | plt_code == "") %>%
   inner_join(site_filtered, by = "siteID_date") %>%
-  mutate(percent = ifelse(perc_cov==1, 0.05/2,
+  mutate(percent = ifelse(perc_cov==0,0,
+            ifelse(perc_cov==1, 0.05/2,
             ifelse(perc_cov==2, (.25+.05)/2,
             ifelse(perc_cov==3, (.5+.25)/2,
             ifelse(perc_cov==4, (.75+.5)/2,
             ifelse(perc_cov==5, (.95+.75)/2,
-            ifelse(perc_cov==6, (1+.95)/2, NA)))))))
+            ifelse(perc_cov==6, (1+.95)/2, NA)))))))) %>%
+  filter(!siteID.x %in% "RZ_1")
+  
 str(joined_data)
 view(joined_data)
 
-# Add 0's to ifelse code
+# Create histograms to decide if the data has a normal distribution
 
-# Filter out RZ_1 because of NA and no other POCR observations for the site.
+ggplot(joined_data %>%
+         filter(year==2023),
+       aes(x=percent *100)) +
+  geom_histogram(binwidth = 5, fill = "orange", alpha = 0.7, color = "black") +
+  labs(title = "Percent Cover Histogram for 2023", 
+       x = "Percent Cover (%)", 
+       y = "Frequency") +
+  theme_minimal()
 
-# Group by site_id and year and add together percent and divide by 5.
+ggplot(joined_data %>%
+        filter(year==2024),
+      aes(x=percent *100)) +
+  geom_histogram(binwidth = 5, fill = "blue", alpha = 0.7, color = "black") +
+  labs(title = "Percent Cover Histogram for 2024", 
+       x = "Percent Cover (%)", 
+       y = "Frequency") +
+  theme_minimal()
 
-# select for columns you want
+ggplot(joined_data,
+       aes(x = percent *100, fill = as.factor(year))) +
+  geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge", color = "black") +
+  labs(title = "Side-by-Side Percent Cover Histogram for 2023-2024", 
+       x = "Percent Cover (%)", 
+       y = "Frequency",
+       fill = "Year") +
+  theme_minimal() +
+  scale_fill_manual(values = c("orange", "blue"))
 
-# unique to only keep the rows unique from one another (format data) it should be a 15 x 2.
+# There is not a normal distribution, so apply a log transformation to the data
+# Then check again
 
-# make a histogram of each years data to see if it's normally distributed. (it probably won't be), so do a
-# log transformation on data. transform percent data into percent (*100).
+log_joined_data <- joined_data %>%
+  mutate(log_percent = log1p(percent *100))
+
+ggplot(log_joined_data,
+       aes(x = percent *100, fill = as.factor(year))) +
+  geom_histogram(binwidth = 5, alpha = 0.7, position = "dodge", color = "black") +
+  labs(title = "Log-Transformed Percent Cover Histogram for 2023-2024", 
+       x = "Log-Transformed Percent Cover (%)", 
+       y = "Frequency",
+       fill = "Year") +
+  theme_minimal()
+scale_fill_manual(values = c("pink", "green"))
+
+summary(joined_data$percent *100)
+summary(log_joined_data$log_percent)
 
 # Calculate mean cover by plot and site, accounting for NAs and 0s
 mean_cover <- joined_data %>%
   group_by(siteID.x, year) %>%
-  summarise(mean_cover = mean(percent, na.rm = TRUE), .groups = 'drop')
+  summarise(mean_cover = sum(percent, na.rm = TRUE)/5, .groups = 'drop')
 
 print(mean_cover)
+view(mean_cover)
+
+unique(joined_data$siteID.x)
+unique(site_filtered$siteID)
+
+# It looks like there is maybe too many 0's for the log tranformation to work property for these data...
+
+
+#PAUSE
+# --------------------------------------------------------------------------------------------------------------------
 
 # Format data
 formatted_data <- mean_cover %>%
@@ -61,6 +112,7 @@ formatted_data <- mean_cover %>%
   filter(!is.na('2023') & !is.na('2024'))
 
 print(formatted_data)
+view(formatted_data)
 
 # Run paired t-test comparing mean cover between 2023 and 2024
 t_test_result <- t.test(formatted_data$'2023', formatted_data$'2024', paired = TRUE)
