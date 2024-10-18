@@ -2,6 +2,8 @@
 library(DBI)
 library(tidyverse)
 library(ggplot2)
+library(glmmTMB)
+library(DHARMa)
 
 # Connect to SQLite database
 deltavegdb<-dbConnect(RSQLite::SQLite(),"./Data/deltavegsurvey.db")
@@ -40,6 +42,10 @@ joined_data <- site_filtered %>%
   
 str(joined_data)
 view(joined_data)
+
+# Make a simplified joine_data table here:
+joined_data %>%
+# dplyr::select(columns you want)
 
 # Calculate mean cover by plot and site, accounting for NAs and 0s
 mean_cover <- joined_data %>%
@@ -110,7 +116,29 @@ ggplot(log_joined_data,
 summary(joined_data$percent *100)
 summary(log_joined_data$log_percent)
 
-# It looks like there is maybe too many 0's for the log tranformation to work property for these data...
+# It looks like there is maybe too many 0's for the log transformation to work property for these data...
+
+# Generalized linear model
+# Make 0's a little higher (values for this model must be between 0 and 1)
+# Calculate mean cover by plot and site, accounting for NAs and 0s
+
+mean_cover$mean_cover[mean_cover$mean_cover == 0] <- 0.0001
+
+view(mean_cover)
+
+mod <- glmmTMB(mean_cover ~ year,
+               data = mean_cover,
+               family = beta_family)
+
+summary(mod)
+# There is no change in mean between years
+
+simulateResiduals(mod, plot = T)
+# Too many 0's
+
+# For undergrad data, use count of POCR instead. Sites where POCR was in the plot vs not.
+# Bar plot:
+
 
 ##############
 #PAUSE
