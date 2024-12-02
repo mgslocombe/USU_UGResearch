@@ -29,23 +29,19 @@ view(plot_data)
 # Join plot data with site data on site ID and siteID_date
 joined_data <- site_filtered %>%
   left_join(plot_data %>%
-  filter(plt_code == "POCR" | plt_code == ""),
-  by = "siteID_date") %>%
+              filter(plt_code == "POCR" | plt_code == ""),
+            by = "siteID_date") %>%
   mutate(percent = ifelse(is.na(perc_cov), 0,
-              ifelse(perc_cov==0,0,
-              ifelse(perc_cov==1, 0.05/2,
-              ifelse(perc_cov==2, (.25+.05)/2,
-              ifelse(perc_cov==3, (.5+.25)/2,
-              ifelse(perc_cov==4, (.75+.5)/2,
-              ifelse(perc_cov==5, (.95+.75)/2,
-              ifelse(perc_cov==6, (1+.95)/2, NA)))))))))
-  
+                          ifelse(perc_cov==0,0,
+                                 ifelse(perc_cov==1, 0.05/2,
+                                        ifelse(perc_cov==2, (.25+.05)/2,
+                                               ifelse(perc_cov==3, (.5+.25)/2,
+                                                      ifelse(perc_cov==4, (.75+.5)/2,
+                                                             ifelse(perc_cov==5, (.95+.75)/2,
+                                                                    ifelse(perc_cov==6, (1+.95)/2, NA)))))))))
+
 str(joined_data)
 view(joined_data)
-
-# Make a simplified joine_data table here:
-joined_data %>%
-# dplyr::select(columns you want)
 
 # Calculate mean cover by plot and site, accounting for NAs and 0s
 mean_cover <- joined_data %>%
