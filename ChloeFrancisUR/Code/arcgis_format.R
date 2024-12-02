@@ -19,7 +19,7 @@ site_data<- dbGetQuery(deltavegdb, "SELECT * FROM site;")
 head(site_data)
 head(plot_data)
 
-# Filter site data fro 2023-August and 2024-July
+# Filter site data fro 2023-August and 2024-Sept
 site_filtered <- site_data %>%
   filter(survey_date %in% c('23/08/01', '23/08/02', '24/09/09', '24/09/11')) %>%
   mutate(year = case_when(
@@ -35,36 +35,20 @@ joined_data <- site_filtered %>%
   left_join(plot_data %>%
               filter(plt_code == "POCR" | plt_code == ""),
             by = "siteID_date") %>%
-  mutate(percent = ifelse(is.na(perc_cov), 0,
-                          ifelse(perc_cov==0,0,
-                                 ifelse(perc_cov==1, 0.05/2,
-                                        ifelse(perc_cov==2, (.25+.05)/2,
-                                               ifelse(perc_cov==3, (.5+.25)/2,
-                                                      ifelse(perc_cov==4, (.75+.5)/2,
-                                                             ifelse(perc_cov==5, (.95+.75)/2,
-                                                                    ifelse(perc_cov==6, (1+.95)/2, NA)))))))))
+  mutate(pres = ifelse(!is.na(perc_cov) & perc_cov > 0,1,0)) #1 for presence, 0 for absence
 
 str(joined_data)
 view(joined_data)
 
-# Calculate mean cover by plot and site, accounting for NAs and 0s
-mean_cover <- joined_data %>%
+plot_summary <- joined_data %>%
   group_by(siteID.x, year) %>%
-  summarise(mean_cover = sum(percent, na.rm = TRUE)/5, .groups = 'drop')
+  summarise(
+    presence = sum(pres, na.rm = TRUE), #Sum of presence across all subplots
+    absence = 5*15 - presence, #Total possible subplots (15*5) minus presence
+    .groups = 'drop'
+  )
 
-print(mean_cover)
-view(mean_cover)
-
-unique(joined_data$siteID.x)
-unique(site_filtered$siteID)
-
-# Format data
-formatted_data <- mean_cover %>%
-  pivot_wider(names_from = year, values_from = mean_cover) %>%
-  filter(!is.na('2023') & !is.na('2024'))
-
-print(formatted_data)
-view(formatted_data)
+view(plot_summary)
 
 # Manually create a data frame with GPS coordinates for each site
 gps_data <- tibble(
@@ -79,21 +63,29 @@ gps_data <- tibble(
                -111.718471, -111.719109, -111.718547)
 )
 
-# Join the manually inputted GPS coordinates to the mean_cover data
-mean_cover_with_gps <- mean_cover %>%
+plot_summary_with_gps <- plot_summary %>%
   left_join(gps_data, by = "siteID.x")
 
-# View the resulting data with GPS coordinates
-print(mean_cover_with_gps)
-view(mean_cover_with_gps)
+view(plot_summary_with_gps)
 
-# Pivot the data and include GPS_lat and GPS_long
-final_formatted_data <- mean_cover_with_gps %>%
-  pivot_wider(names_from = year, values_from = mean_cover) %>%
-  filter(!is.na(`2023`) & !is.na(`2024`)) %>%
-  select(siteID.x, GPS_lat, GPS_long, everything())  # Keep GPS_lat and GPS_long along with the years
+# Format data
+formatted_data <- plot_summary_with_gps %>%
+  pivot_wider(
+    names_from = year,
+    values_from = c(presence, absence),
+    names_prefix = "year_"
+  )
+view(plot_summary_reshaped)
 
-# View the final formatted data
-print(final_formatted_data)
-view(final_formatted_data)
+
+print(formatted_data)
+view(formatted_data)
+
+#Export as CSV for ArcGIS
+# 30-rows (two rows per plot, 2023 and 2024 as rows)
+write.csv(plot_summary_with_gps, "plot_summary_30_rows.csv", row.names = FALSE)
+
+# 15-row format (cone row per plot, 2023 and 2024 as columns)
+write.csv(formatted_data, "plot_summary_15_rows.csv", row.names = FALSE)
+
 
