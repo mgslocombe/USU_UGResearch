@@ -27,8 +27,8 @@ site_filtered <- site_data %>%
     survey_date %in% c('24/09/09', '24/09/11') ~ 2024
   ))
 
-view(site_filtered)
-view(plot_data)
+head(site_filtered)
+head(plot_data)
 
 # Join plot data with site data on site ID and siteID_date
 joined_data <- site_filtered %>%
@@ -38,17 +38,17 @@ joined_data <- site_filtered %>%
   mutate(pres = ifelse(!is.na(perc_cov) & perc_cov > 0,1,0)) #1 for presence, 0 for absence
 
 str(joined_data)
-view(joined_data)
+head(joined_data)
 
 plot_summary <- joined_data %>%
   group_by(siteID.x, year) %>%
   summarise(
     presence = sum(pres, na.rm = TRUE), #Sum of presence across all subplots
-    absence = 5*15 - presence, #Total possible subplots (15*5) minus presence
+    absence = 5 - presence, #Total possible subplots (15*5) minus presence
     .groups = 'drop'
   )
 
-view(plot_summary)
+head(plot_summary)
 
 # Manually create a data frame with GPS coordinates for each site
 gps_data <- tibble(
@@ -75,11 +75,11 @@ formatted_data <- plot_summary_with_gps %>%
     values_from = c(presence, absence),
     names_prefix = "year_"
   )
-view(plot_summary_reshaped)
 
 
 print(formatted_data)
 view(formatted_data)
+
 
 #Export as CSV for ArcGIS
 # 30-rows (two rows per plot, 2023 and 2024 as rows)
@@ -87,5 +87,3 @@ write.csv(plot_summary_with_gps, "plot_summary_30_rows.csv", row.names = FALSE)
 
 # 15-row format (cone row per plot, 2023 and 2024 as columns)
 write.csv(formatted_data, "plot_summary_15_rows.csv", row.names = FALSE)
-
-
